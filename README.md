@@ -1,6 +1,6 @@
 # citius-php
 
-PHP gRPC client stubs for the Citius crypto API (`caas.crypto.v1`), generated from the protobuf definitions of [agile-crypto/api](https://github.com/agile-crypto/api).
+PHP gRPC client stubs for the Citius crypto API (`caas.crypto.v1`), generated from the protobuf definitions of [citius/api](https://github.ibm.com/citius/api), included as a git submodule in `proto/api`.
 
 Only the services needed by the Nextcloud WebAuthn adapter are generated:
 
@@ -16,13 +16,27 @@ Generation works per service (proto file), not per RPC, so each client exposes a
 
 | Path | Content |
 |---|---|
-| `proto/api/` | Clone of `agile-crypto/api` (the `.proto` sources) |
+| `proto/api/` | Git submodule `citius/api`, tracking `main` (the `.proto` sources) |
 | `buf.gen.php.yaml` | buf generation template for PHP |
 | `gen/Citius/Grpc/` | Generated code (do not edit), autoloaded as `Citius\Grpc\` |
 
+## Clone
+
+The submodule URL uses SSH, so you need read access to `citius/api` and an SSH key on github.ibm.com.
+
+```bash
+git clone --recurse-submodules  git@github.ibm.com:citius/citius-php.git
+```
+
+In an existing clone without the submodule checked out:
+
+```bash
+git submodule update --init
+```
+
 ## Requirements
 
-- Generation: [buf](https://buf.build/docs/installation) (`brew install bufbuild/buf/buf`) and network access to `buf.build`, which hosts the remote plugins.
+- Generation: [buf](https://buf.build/docs/installation) (`brew install bufbuild/buf/buf`) and network access to `buf.build`, which hosts the remote plugins. Unauthenticated requests are rate limited (`resource_exhausted: too many requests`). Log in with `buf registry login`, or set `BUF_TOKEN` where no login is stored, for example in a container.
 - Runtime: PHP >= 8.3 with the `grpc` extension. The `protobuf` extension is optional but recommended.
 
 ## Generate the PHP code
@@ -45,6 +59,24 @@ composer run generate
 `clean: true` in the template deletes `gen/` before each run, so removed messages do not linger. Commit `gen/` so consumers do not need buf.
 
 To generate another service, add its file with an extra `--path` in both the command above and the `generate` script in `composer.json`. Its message and type dependencies are included automatically.
+
+## Update the API version
+
+Move the submodule to the latest commit of `main`, regenerate, and commit the submodule pointer together with `gen/`, so each version of `gen/` matches the API commit it was generated from:
+
+```bash
+git submodule update --remote proto/api
+composer run generate
+git add proto/api gen
+git commit -m "update citius/api to $(git -C proto/api describe --tags --always)"
+```
+
+To use a specific tag instead, check it out in the submodule before generating:
+
+```bash
+git -C proto/api fetch --tags
+git -C proto/api checkout v0.2.0
+```
 
 ## What the template does
 
