@@ -1,0 +1,25 @@
+{
+	"name": "citius/citius-php",
+	"description": "PHP gRPC client stubs for the Citius crypto API",
+	"type": "library",
+	"require": {
+		"php": "^8.3",
+		"ext-grpc": "*",
+		"google/protobuf": "^4.33",
+		"grpc/grpc": "^1.74"
+	},
+	"suggest": {
+		"ext-protobuf": "Native protobuf runtime, faster than the pure PHP implementation of google/protobuf"
+	},
+	"autoload": {
+		"psr-4": {
+			"Citius\\Grpc\\": "gen/Citius/Grpc/"
+		}
+	},
+	"scripts": {
+		"generate": "buf generate proto/api/proto --template buf.gen.php.yaml --path proto/api/proto/services/crypto_service.proto --path proto/api/proto/services/key_management_service.proto --path proto/api/proto/services/crypto_policy_service.proto"
+	},
+	"scripts-descriptions": {
+		"generate": "Regenerate the PHP stubs in gen/ from proto/api (requires buf)"
+	}
+}

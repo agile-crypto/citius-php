@@ -1,0 +1,38 @@
+version: v2
+clean: true
+managed:
+  enabled: true
+  override:
+    # Everything under one vendor namespace instead of the default Crypto\V1 / GPBMetadata\Types\...
+    - file_option: php_namespace
+      path: api.proto
+      value: Citius\Grpc\Crypto\V1
+    - file_option: php_namespace
+      path: messages
+      value: Citius\Grpc\Crypto\V1
+    - file_option: php_namespace
+      path: services
+      value: Citius\Grpc\Crypto\V1
+    - file_option: php_namespace
+      path: types
+      value: Citius\Grpc\Crypto\V1
+    - file_option: php_metadata_namespace
+      path: api.proto
+      value: Citius\Grpc\GPBMetadata
+    - file_option: php_metadata_namespace
+      path: messages
+      value: Citius\Grpc\GPBMetadata\Messages
+    - file_option: php_metadata_namespace
+      path: services
+      value: Citius\Grpc\GPBMetadata\Services
+    - file_option: php_metadata_namespace
+      path: types
+      value: Citius\Grpc\GPBMetadata\Types
+plugins:
+  - remote: buf.build/protocolbuffers/php:v33.2
+    out: gen
+    include_imports: true
+    exclude_types: [buf.validate.field, buf.validate.message, buf.validate.oneof, buf.validate.predefined, google.api.http]
+  - remote: buf.build/grpc/php:v1.83.1
+    out: gen
+    exclude_types: [buf.validate.field, buf.validate.message, buf.validate.oneof, buf.validate.predefined, google.api.http]
