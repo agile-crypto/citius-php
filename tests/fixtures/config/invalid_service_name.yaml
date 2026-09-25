@@ -1,0 +1,13 @@
+default:
+  endpoint: "default.example.com:443"
+  tls:
+    ca_cert: "/etc/certs/ca.pem"
+    client_cert: "/etc/certs/client.pem"
+    client_key: "/etc/certs/client.key"
+    insecure: false
+  auth:
+    enabled: true
+    static_token: "default-token"
+  timeout: "30s"
+
+invalid_service: {}

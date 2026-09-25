@@ -1,0 +1,15 @@
+default:
+  endpoint: "default.example.com:443"
+  tls:
+    insecure: false
+    ca_cert: "/etc/certs/ca.pem"
+  auth:
+    enabled: true
+    token_source: "tests/fixtures/config/example.token"
+  timeout: "30s"
+
+key_management: {}
+
+crypto: {}
+
+# discovery, key_establishment, crypto_policy, provider, streaming_crypto are absent

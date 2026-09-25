@@ -1,0 +1,40 @@
+default:
+  endpoint: "default.example.com:443"
+  tls:
+    ca_cert: "/etc/certs/ca.pem"
+    client_cert: "/etc/certs/client.pem"
+    client_key: "/etc/certs/client.key"
+    insecure: false
+    server_name: "default.example.com"
+    min_version: "1.3"
+  auth:
+    enabled: true
+    static_token: "default-token"
+  timeout: "30s"
+
+key_management: {}
+
+crypto:
+  endpoint: "crypto.example.com:443"
+
+crypto_policy:
+  auth:
+    enabled: false
+    static_token: ""
+
+discovery:
+  endpoint: "discovery.example.com:443"
+  tls:
+    insecure: true
+  auth:
+    enabled: false
+    static_token: ""
+  timeout: "5s"
+
+key_establishment:
+  timeout: "60s"
+
+provider: {}
+
+streaming_crypto:
+  endpoint: "streaming.example.com:443"

@@ -1,25 +1,40 @@
 {
 	"name": "citius/citius-php",
-	"description": "PHP gRPC client stubs for the Citius crypto API",
+	"description": "PHP gRPC client for the Citius crypto API: generated stubs and YAML-configured connections",
 	"type": "library",
 	"require": {
 		"php": "^8.3",
 		"ext-grpc": "*",
+		"ext-openssl": "*",
 		"google/protobuf": "^4.33",
-		"grpc/grpc": "^1.74"
+		"grpc/grpc": "^1.74",
+		"symfony/yaml": "^7.4"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^11.5"
 	},
 	"suggest": {
 		"ext-protobuf": "Native protobuf runtime, faster than the pure PHP implementation of google/protobuf"
 	},
 	"autoload": {
 		"psr-4": {
+			"Citius\\Client\\": "src/",
 			"Citius\\Grpc\\": "gen/Citius/Grpc/"
 		}
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"Citius\\Client\\Tests\\": "tests/"
+		}
+	},
 	"scripts": {
-		"generate": "buf generate proto/api/proto --template buf.gen.php.yaml --path proto/api/proto/services/crypto_service.proto --path proto/api/proto/services/key_management_service.proto --path proto/api/proto/services/crypto_policy_service.proto"
+		"generate": "buf generate proto/api/proto --template buf.gen.php.yaml --path proto/api/proto/services/crypto_service.proto --path proto/api/proto/services/key_management_service.proto --path proto/api/proto/services/crypto_policy_service.proto",
+		"test": "phpunit --testsuite unit",
+		"test:integration": "phpunit --testsuite integration"
 	},
 	"scripts-descriptions": {
-		"generate": "Regenerate the PHP stubs in gen/ from proto/api (requires buf)"
+		"generate": "Regenerate the PHP stubs in gen/ from proto/api (requires buf)",
+		"test": "Run the unit tests",
+		"test:integration": "Run the integration tests against a running Citius server (see README)"
 	}
 }

@@ -1,0 +1,16 @@
+default:
+  endpoint: "default.example.com:443"
+  tls:
+    insecure: false
+    ca_cert: "/etc/certs/ca.pem"
+  auth:
+    enabled: true
+    static_token: "my-token"
+  timeout: "30s"
+
+key_management: {}
+
+crypto:
+  endpoint: "crypto.example.com:443"
+
+# discovery, key_establishment, crypto_policy, provider, streaming_crypto are absent
