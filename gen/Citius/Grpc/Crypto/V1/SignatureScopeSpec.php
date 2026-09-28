@@ -46,6 +46,24 @@ class SignatureScopeSpec extends \Google\Protobuf\Internal\Message
      */
     protected $deterministic = null;
     /**
+     * Digest hashes accepted by a PREHASHED or PREHASHED_WITH_CONTEXT scope, in
+     * order of preference: the first entry is the preferred hash.
+     *   Template: hashes the template can sign without weakening its advertised
+     *             security. Required (non-empty) on every prehashed scope; the
+     *             catalog validator and the service's catalog loader enforce it.
+     *   Request:  a requirement. The selected template must accept every entry.
+     *             Empty means no requirement.
+     *   Key:      hashes this key version accepts. Always non-empty for a
+     *             prehashed version: CreateKey and TransformKey store the
+     *             request's list, or the template's list when it is empty.
+     * Applications hash with accepted_digest_hashes[0] of the key's scope spec
+     * (ReadKey), so the hash can change without code changes.
+     * Must be empty for STANDARD and WITH_CONTEXT scopes.
+     *
+     * Generated from protobuf field <code>repeated .caas.crypto.v1.HashAlgorithm accepted_digest_hashes = 5 [json_name = "acceptedDigestHashes"];</code>
+     */
+    private $accepted_digest_hashes;
+    /**
      * Extensibility: Additional properties not covered by typed fields.
      * Use for vendor-specific, compliance, or future requirements.
      *
@@ -70,6 +88,20 @@ class SignatureScopeSpec extends \Google\Protobuf\Internal\Message
      *     @type bool $deterministic
      *           Deterministic: Same input always produces same signature.
      *           Relevant for: Reproducibility, testing, side-channel resistance.
+     *     @type int[] $accepted_digest_hashes
+     *           Digest hashes accepted by a PREHASHED or PREHASHED_WITH_CONTEXT scope, in
+     *           order of preference: the first entry is the preferred hash.
+     *             Template: hashes the template can sign without weakening its advertised
+     *                       security. Required (non-empty) on every prehashed scope; the
+     *                       catalog validator and the service's catalog loader enforce it.
+     *             Request:  a requirement. The selected template must accept every entry.
+     *                       Empty means no requirement.
+     *             Key:      hashes this key version accepts. Always non-empty for a
+     *                       prehashed version: CreateKey and TransformKey store the
+     *                       request's list, or the template's list when it is empty.
+     *           Applications hash with accepted_digest_hashes[0] of the key's scope spec
+     *           (ReadKey), so the hash can change without code changes.
+     *           Must be empty for STANDARD and WITH_CONTEXT scopes.
      *     @type array|\Google\Protobuf\Internal\MapField $additional_properties
      *           Extensibility: Additional properties not covered by typed fields.
      *           Use for vendor-specific, compliance, or future requirements.
@@ -216,6 +248,56 @@ class SignatureScopeSpec extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->deterministic = $var;
+
+        return $this;
+    }
+
+    /**
+     * Digest hashes accepted by a PREHASHED or PREHASHED_WITH_CONTEXT scope, in
+     * order of preference: the first entry is the preferred hash.
+     *   Template: hashes the template can sign without weakening its advertised
+     *             security. Required (non-empty) on every prehashed scope; the
+     *             catalog validator and the service's catalog loader enforce it.
+     *   Request:  a requirement. The selected template must accept every entry.
+     *             Empty means no requirement.
+     *   Key:      hashes this key version accepts. Always non-empty for a
+     *             prehashed version: CreateKey and TransformKey store the
+     *             request's list, or the template's list when it is empty.
+     * Applications hash with accepted_digest_hashes[0] of the key's scope spec
+     * (ReadKey), so the hash can change without code changes.
+     * Must be empty for STANDARD and WITH_CONTEXT scopes.
+     *
+     * Generated from protobuf field <code>repeated .caas.crypto.v1.HashAlgorithm accepted_digest_hashes = 5 [json_name = "acceptedDigestHashes"];</code>
+     * @return RepeatedField<int>
+     */
+    public function getAcceptedDigestHashes()
+    {
+        return $this->accepted_digest_hashes;
+    }
+
+    /**
+     * Digest hashes accepted by a PREHASHED or PREHASHED_WITH_CONTEXT scope, in
+     * order of preference: the first entry is the preferred hash.
+     *   Template: hashes the template can sign without weakening its advertised
+     *             security. Required (non-empty) on every prehashed scope; the
+     *             catalog validator and the service's catalog loader enforce it.
+     *   Request:  a requirement. The selected template must accept every entry.
+     *             Empty means no requirement.
+     *   Key:      hashes this key version accepts. Always non-empty for a
+     *             prehashed version: CreateKey and TransformKey store the
+     *             request's list, or the template's list when it is empty.
+     * Applications hash with accepted_digest_hashes[0] of the key's scope spec
+     * (ReadKey), so the hash can change without code changes.
+     * Must be empty for STANDARD and WITH_CONTEXT scopes.
+     *
+     * Generated from protobuf field <code>repeated .caas.crypto.v1.HashAlgorithm accepted_digest_hashes = 5 [json_name = "acceptedDigestHashes"];</code>
+     * @param int[] $var
+     * @return $this
+     */
+    public function setAcceptedDigestHashes($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::ENUM, \Citius\Grpc\Crypto\V1\HashAlgorithm::class);
+        $this->accepted_digest_hashes = $arr;
 
         return $this;
     }

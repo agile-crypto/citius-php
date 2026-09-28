@@ -142,4 +142,20 @@ class CryptoPolicyServiceClient extends \Grpc\BaseStub {
         $metadata, $options);
     }
 
+    /**
+     * ListAllowedAlgorithms returns the list of algorithm templates allowed by a given policy, in order
+     * of preference. This is useful for clients that want to select an algorithm that is allowed by policy.
+     * @param \Citius\Grpc\Crypto\V1\ListAllowedAlgorithmsRequest $argument input argument
+     * @param array $metadata metadata
+     * @param array $options call options
+     * @return \Grpc\UnaryCall<\Citius\Grpc\Crypto\V1\ListAllowedAlgorithmsResponse>
+     */
+    public function ListAllowedAlgorithms(\Citius\Grpc\Crypto\V1\ListAllowedAlgorithmsRequest $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/caas.crypto.v1.CryptoPolicyService/ListAllowedAlgorithms',
+        $argument,
+        ['\Citius\Grpc\Crypto\V1\ListAllowedAlgorithmsResponse', 'decode'],
+        $metadata, $options);
+    }
+
 }

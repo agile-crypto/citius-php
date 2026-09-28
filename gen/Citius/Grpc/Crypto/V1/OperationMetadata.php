@@ -59,6 +59,18 @@ class OperationMetadata extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>map<string, string> user_context = 4 [json_name = "userContext"];</code>
      */
     private $user_context;
+    /**
+     * Hash that produced the digest of a DigestSign operation. Set by the
+     * service, never by the caller; unset for every other operation.
+     * DigestVerify takes the hash from here, and it is part of the audit trail.
+     * This is the one piece of algorithm identity carried here rather than
+     * derived from the template: a prehashed template accepts several hashes
+     * (TemplateInfo scope accepted_digest_hashes), so the template alone does
+     * not say which one produced a given signature.
+     *
+     * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm digest_hash = 5 [json_name = "digestHash"];</code>
+     */
+    protected $digest_hash = 0;
 
     /**
      * Constructor.
@@ -95,6 +107,14 @@ class OperationMetadata extends \Google\Protobuf\Internal\Message
      *           Examples: {"tenant_id": "acme", "classification": "pci", "request_id": "abc-123"}
      *           This field is NOT cryptographically authenticated — it is for audit/logging only.
      *           For application-level authenticated data, use AEAD's associated_data field.
+     *     @type int $digest_hash
+     *           Hash that produced the digest of a DigestSign operation. Set by the
+     *           service, never by the caller; unset for every other operation.
+     *           DigestVerify takes the hash from here, and it is part of the audit trail.
+     *           This is the one piece of algorithm identity carried here rather than
+     *           derived from the template: a prehashed template accepts several hashes
+     *           (TemplateInfo scope accepted_digest_hashes), so the template alone does
+     *           not say which one produced a given signature.
      * }
      */
     public function __construct($data = NULL) {
@@ -254,6 +274,44 @@ class OperationMetadata extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
         $this->user_context = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Hash that produced the digest of a DigestSign operation. Set by the
+     * service, never by the caller; unset for every other operation.
+     * DigestVerify takes the hash from here, and it is part of the audit trail.
+     * This is the one piece of algorithm identity carried here rather than
+     * derived from the template: a prehashed template accepts several hashes
+     * (TemplateInfo scope accepted_digest_hashes), so the template alone does
+     * not say which one produced a given signature.
+     *
+     * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm digest_hash = 5 [json_name = "digestHash"];</code>
+     * @return int
+     */
+    public function getDigestHash()
+    {
+        return $this->digest_hash;
+    }
+
+    /**
+     * Hash that produced the digest of a DigestSign operation. Set by the
+     * service, never by the caller; unset for every other operation.
+     * DigestVerify takes the hash from here, and it is part of the audit trail.
+     * This is the one piece of algorithm identity carried here rather than
+     * derived from the template: a prehashed template accepts several hashes
+     * (TemplateInfo scope accepted_digest_hashes), so the template alone does
+     * not say which one produced a given signature.
+     *
+     * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm digest_hash = 5 [json_name = "digestHash"];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setDigestHash($var)
+    {
+        GPBUtil::checkEnum($var, \Citius\Grpc\Crypto\V1\HashAlgorithm::class);
+        $this->digest_hash = $var;
 
         return $this;
     }

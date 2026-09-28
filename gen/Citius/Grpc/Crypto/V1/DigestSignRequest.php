@@ -23,29 +23,18 @@ class DigestSignRequest extends \Google\Protobuf\Internal\Message
      */
     protected $digest = '';
     /**
-     * Hash algorithm used to compute the digest - REQUIRED.
-     * Declares which hash algorithm was used to produce the digest bytes.
-     * Security purpose:
-     *   1. Digest size validation (prevents policy bypass - SHA-1 digest can't claim to be SHA-256)
-     *   2. Policy enforcement (reject weak hash algorithms like SHA-1, MD5)
-     *   3. Audit trail (returned in OperationMetadata.used_hash_algorithm)
-     * The service validates that len(digest) matches the output size of this algorithm.
-     * Example: SHA-256 → 32 bytes, SHA-384 → 48 bytes, SHA-512 → 64 bytes
+     * Hash algorithm that produced the digest - REQUIRED.
+     * The key version accepts only the hashes in its scope spec's
+     * accepted_digest_hashes (see ReadKey; the first entry is the preferred
+     * hash). Any other hash is rejected with INVALID_ARGUMENT. The service also
+     * checks that len(digest) matches this hash's output size, and records the
+     * hash in the response's OperationMetadata.digest_hash, which DigestVerify
+     * uses.
      * PKCS#11 Reference: CKM_ECDSA (prehashed) vs CKM_ECDSA_SHA256 (hash-then-sign)
      *
      * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm hash_algorithm = 6 [json_name = "hashAlgorithm"];</code>
      */
     protected $hash_algorithm = 0;
-    /**
-     * Optional: OID of the hash algorithm for extensibility.
-     * Use when hash_algorithm is HASH_ALGORITHM_OTHER or for explicit OID-based validation.
-     * Example: "2.16.840.1.101.3.4.2.1" for SHA-256, "2.16.840.1.101.3.4.2.8" for SHA3-256
-     * When both are specified, service validates they match.
-     * When only OID is specified with HASH_ALGORITHM_OTHER, service uses OID for validation.
-     *
-     * Generated from protobuf field <code>string hash_algorithm_oid = 7 [json_name = "hashAlgorithmOid"];</code>
-     */
-    protected $hash_algorithm_oid = '';
     /**
      * Optional: User-provided context for audit trail enrichment.
      *
@@ -69,21 +58,14 @@ class DigestSignRequest extends \Google\Protobuf\Internal\Message
      *     @type \Citius\Grpc\Crypto\V1\VendorSignatureContext $vendor_context
      *           Vendor/custom scope
      *     @type int $hash_algorithm
-     *           Hash algorithm used to compute the digest - REQUIRED.
-     *           Declares which hash algorithm was used to produce the digest bytes.
-     *           Security purpose:
-     *             1. Digest size validation (prevents policy bypass - SHA-1 digest can't claim to be SHA-256)
-     *             2. Policy enforcement (reject weak hash algorithms like SHA-1, MD5)
-     *             3. Audit trail (returned in OperationMetadata.used_hash_algorithm)
-     *           The service validates that len(digest) matches the output size of this algorithm.
-     *           Example: SHA-256 → 32 bytes, SHA-384 → 48 bytes, SHA-512 → 64 bytes
+     *           Hash algorithm that produced the digest - REQUIRED.
+     *           The key version accepts only the hashes in its scope spec's
+     *           accepted_digest_hashes (see ReadKey; the first entry is the preferred
+     *           hash). Any other hash is rejected with INVALID_ARGUMENT. The service also
+     *           checks that len(digest) matches this hash's output size, and records the
+     *           hash in the response's OperationMetadata.digest_hash, which DigestVerify
+     *           uses.
      *           PKCS#11 Reference: CKM_ECDSA (prehashed) vs CKM_ECDSA_SHA256 (hash-then-sign)
-     *     @type string $hash_algorithm_oid
-     *           Optional: OID of the hash algorithm for extensibility.
-     *           Use when hash_algorithm is HASH_ALGORITHM_OTHER or for explicit OID-based validation.
-     *           Example: "2.16.840.1.101.3.4.2.1" for SHA-256, "2.16.840.1.101.3.4.2.8" for SHA3-256
-     *           When both are specified, service validates they match.
-     *           When only OID is specified with HASH_ALGORITHM_OTHER, service uses OID for validation.
      *     @type array|\Google\Protobuf\Internal\MapField $user_context
      *           Optional: User-provided context for audit trail enrichment.
      * }
@@ -231,14 +213,13 @@ class DigestSignRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Hash algorithm used to compute the digest - REQUIRED.
-     * Declares which hash algorithm was used to produce the digest bytes.
-     * Security purpose:
-     *   1. Digest size validation (prevents policy bypass - SHA-1 digest can't claim to be SHA-256)
-     *   2. Policy enforcement (reject weak hash algorithms like SHA-1, MD5)
-     *   3. Audit trail (returned in OperationMetadata.used_hash_algorithm)
-     * The service validates that len(digest) matches the output size of this algorithm.
-     * Example: SHA-256 → 32 bytes, SHA-384 → 48 bytes, SHA-512 → 64 bytes
+     * Hash algorithm that produced the digest - REQUIRED.
+     * The key version accepts only the hashes in its scope spec's
+     * accepted_digest_hashes (see ReadKey; the first entry is the preferred
+     * hash). Any other hash is rejected with INVALID_ARGUMENT. The service also
+     * checks that len(digest) matches this hash's output size, and records the
+     * hash in the response's OperationMetadata.digest_hash, which DigestVerify
+     * uses.
      * PKCS#11 Reference: CKM_ECDSA (prehashed) vs CKM_ECDSA_SHA256 (hash-then-sign)
      *
      * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm hash_algorithm = 6 [json_name = "hashAlgorithm"];</code>
@@ -250,14 +231,13 @@ class DigestSignRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Hash algorithm used to compute the digest - REQUIRED.
-     * Declares which hash algorithm was used to produce the digest bytes.
-     * Security purpose:
-     *   1. Digest size validation (prevents policy bypass - SHA-1 digest can't claim to be SHA-256)
-     *   2. Policy enforcement (reject weak hash algorithms like SHA-1, MD5)
-     *   3. Audit trail (returned in OperationMetadata.used_hash_algorithm)
-     * The service validates that len(digest) matches the output size of this algorithm.
-     * Example: SHA-256 → 32 bytes, SHA-384 → 48 bytes, SHA-512 → 64 bytes
+     * Hash algorithm that produced the digest - REQUIRED.
+     * The key version accepts only the hashes in its scope spec's
+     * accepted_digest_hashes (see ReadKey; the first entry is the preferred
+     * hash). Any other hash is rejected with INVALID_ARGUMENT. The service also
+     * checks that len(digest) matches this hash's output size, and records the
+     * hash in the response's OperationMetadata.digest_hash, which DigestVerify
+     * uses.
      * PKCS#11 Reference: CKM_ECDSA (prehashed) vs CKM_ECDSA_SHA256 (hash-then-sign)
      *
      * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm hash_algorithm = 6 [json_name = "hashAlgorithm"];</code>
@@ -268,40 +248,6 @@ class DigestSignRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkEnum($var, \Citius\Grpc\Crypto\V1\HashAlgorithm::class);
         $this->hash_algorithm = $var;
-
-        return $this;
-    }
-
-    /**
-     * Optional: OID of the hash algorithm for extensibility.
-     * Use when hash_algorithm is HASH_ALGORITHM_OTHER or for explicit OID-based validation.
-     * Example: "2.16.840.1.101.3.4.2.1" for SHA-256, "2.16.840.1.101.3.4.2.8" for SHA3-256
-     * When both are specified, service validates they match.
-     * When only OID is specified with HASH_ALGORITHM_OTHER, service uses OID for validation.
-     *
-     * Generated from protobuf field <code>string hash_algorithm_oid = 7 [json_name = "hashAlgorithmOid"];</code>
-     * @return string
-     */
-    public function getHashAlgorithmOid()
-    {
-        return $this->hash_algorithm_oid;
-    }
-
-    /**
-     * Optional: OID of the hash algorithm for extensibility.
-     * Use when hash_algorithm is HASH_ALGORITHM_OTHER or for explicit OID-based validation.
-     * Example: "2.16.840.1.101.3.4.2.1" for SHA-256, "2.16.840.1.101.3.4.2.8" for SHA3-256
-     * When both are specified, service validates they match.
-     * When only OID is specified with HASH_ALGORITHM_OTHER, service uses OID for validation.
-     *
-     * Generated from protobuf field <code>string hash_algorithm_oid = 7 [json_name = "hashAlgorithmOid"];</code>
-     * @param string $var
-     * @return $this
-     */
-    public function setHashAlgorithmOid($var)
-    {
-        GPBUtil::checkString($var, True);
-        $this->hash_algorithm_oid = $var;
 
         return $this;
     }

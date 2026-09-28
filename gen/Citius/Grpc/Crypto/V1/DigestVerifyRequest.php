@@ -27,31 +27,14 @@ class DigestVerifyRequest extends \Google\Protobuf\Internal\Message
      */
     protected $signature = '';
     /**
-     * Operation metadata from digest sign response.
-     * Contains key_version to ensure correct key is used for verification.
+     * Operation metadata from the DigestSign response. Required: key_version
+     * selects the key version, and digest_hash is the hash that produced the
+     * digest. There is no separate hash argument, so the verifier cannot
+     * disagree with what was signed.
      *
      * Generated from protobuf field <code>.caas.crypto.v1.OperationMetadata metadata = 4 [json_name = "metadata"];</code>
      */
     protected $metadata = null;
-    /**
-     * Hash algorithm used to compute the digest - REQUIRED.
-     * Must match the hash_algorithm from the corresponding DigestSignRequest.
-     * Security purpose:
-     *   1. Digest size validation (SHA-1 digest can't claim to be SHA-256)
-     *   2. Policy enforcement (reject verification with weak hash algorithms)
-     *   3. Audit trail (record which hash was claimed during verification)
-     * The service validates that len(digest) matches the output size of this algorithm.
-     *
-     * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm hash_algorithm = 8 [json_name = "hashAlgorithm"];</code>
-     */
-    protected $hash_algorithm = 0;
-    /**
-     * Optional: OID of the hash algorithm for extensibility.
-     * Same semantics as DigestSignRequest.hash_algorithm_oid.
-     *
-     * Generated from protobuf field <code>string hash_algorithm_oid = 9 [json_name = "hashAlgorithmOid"];</code>
-     */
-    protected $hash_algorithm_oid = '';
     /**
      * Optional: User-provided context for audit trail enrichment.
      *
@@ -70,25 +53,16 @@ class DigestVerifyRequest extends \Google\Protobuf\Internal\Message
      *     @type string $digest
      *     @type string $signature
      *     @type \Citius\Grpc\Crypto\V1\OperationMetadata $metadata
-     *           Operation metadata from digest sign response.
-     *           Contains key_version to ensure correct key is used for verification.
+     *           Operation metadata from the DigestSign response. Required: key_version
+     *           selects the key version, and digest_hash is the hash that produced the
+     *           digest. There is no separate hash argument, so the verifier cannot
+     *           disagree with what was signed.
      *     @type \Citius\Grpc\Crypto\V1\NoParams $no_context
      *           Classical signatures
      *     @type \Citius\Grpc\Crypto\V1\SignatureDomainContext $domain_context
      *           Context-bearing signatures
      *     @type \Citius\Grpc\Crypto\V1\VendorSignatureContext $vendor_context
      *           Vendor/custom scope
-     *     @type int $hash_algorithm
-     *           Hash algorithm used to compute the digest - REQUIRED.
-     *           Must match the hash_algorithm from the corresponding DigestSignRequest.
-     *           Security purpose:
-     *             1. Digest size validation (SHA-1 digest can't claim to be SHA-256)
-     *             2. Policy enforcement (reject verification with weak hash algorithms)
-     *             3. Audit trail (record which hash was claimed during verification)
-     *           The service validates that len(digest) matches the output size of this algorithm.
-     *     @type string $hash_algorithm_oid
-     *           Optional: OID of the hash algorithm for extensibility.
-     *           Same semantics as DigestSignRequest.hash_algorithm_oid.
      *     @type array|\Google\Protobuf\Internal\MapField $user_context
      *           Optional: User-provided context for audit trail enrichment.
      * }
@@ -165,8 +139,10 @@ class DigestVerifyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Operation metadata from digest sign response.
-     * Contains key_version to ensure correct key is used for verification.
+     * Operation metadata from the DigestSign response. Required: key_version
+     * selects the key version, and digest_hash is the hash that produced the
+     * digest. There is no separate hash argument, so the verifier cannot
+     * disagree with what was signed.
      *
      * Generated from protobuf field <code>.caas.crypto.v1.OperationMetadata metadata = 4 [json_name = "metadata"];</code>
      * @return \Citius\Grpc\Crypto\V1\OperationMetadata|null
@@ -187,8 +163,10 @@ class DigestVerifyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Operation metadata from digest sign response.
-     * Contains key_version to ensure correct key is used for verification.
+     * Operation metadata from the DigestSign response. Required: key_version
+     * selects the key version, and digest_hash is the hash that produced the
+     * digest. There is no separate hash argument, so the verifier cannot
+     * disagree with what was signed.
      *
      * Generated from protobuf field <code>.caas.crypto.v1.OperationMetadata metadata = 4 [json_name = "metadata"];</code>
      * @param \Citius\Grpc\Crypto\V1\OperationMetadata $var
@@ -291,72 +269,6 @@ class DigestVerifyRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Citius\Grpc\Crypto\V1\VendorSignatureContext::class);
         $this->writeOneof(7, $var);
-
-        return $this;
-    }
-
-    /**
-     * Hash algorithm used to compute the digest - REQUIRED.
-     * Must match the hash_algorithm from the corresponding DigestSignRequest.
-     * Security purpose:
-     *   1. Digest size validation (SHA-1 digest can't claim to be SHA-256)
-     *   2. Policy enforcement (reject verification with weak hash algorithms)
-     *   3. Audit trail (record which hash was claimed during verification)
-     * The service validates that len(digest) matches the output size of this algorithm.
-     *
-     * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm hash_algorithm = 8 [json_name = "hashAlgorithm"];</code>
-     * @return int
-     */
-    public function getHashAlgorithm()
-    {
-        return $this->hash_algorithm;
-    }
-
-    /**
-     * Hash algorithm used to compute the digest - REQUIRED.
-     * Must match the hash_algorithm from the corresponding DigestSignRequest.
-     * Security purpose:
-     *   1. Digest size validation (SHA-1 digest can't claim to be SHA-256)
-     *   2. Policy enforcement (reject verification with weak hash algorithms)
-     *   3. Audit trail (record which hash was claimed during verification)
-     * The service validates that len(digest) matches the output size of this algorithm.
-     *
-     * Generated from protobuf field <code>.caas.crypto.v1.HashAlgorithm hash_algorithm = 8 [json_name = "hashAlgorithm"];</code>
-     * @param int $var
-     * @return $this
-     */
-    public function setHashAlgorithm($var)
-    {
-        GPBUtil::checkEnum($var, \Citius\Grpc\Crypto\V1\HashAlgorithm::class);
-        $this->hash_algorithm = $var;
-
-        return $this;
-    }
-
-    /**
-     * Optional: OID of the hash algorithm for extensibility.
-     * Same semantics as DigestSignRequest.hash_algorithm_oid.
-     *
-     * Generated from protobuf field <code>string hash_algorithm_oid = 9 [json_name = "hashAlgorithmOid"];</code>
-     * @return string
-     */
-    public function getHashAlgorithmOid()
-    {
-        return $this->hash_algorithm_oid;
-    }
-
-    /**
-     * Optional: OID of the hash algorithm for extensibility.
-     * Same semantics as DigestSignRequest.hash_algorithm_oid.
-     *
-     * Generated from protobuf field <code>string hash_algorithm_oid = 9 [json_name = "hashAlgorithmOid"];</code>
-     * @param string $var
-     * @return $this
-     */
-    public function setHashAlgorithmOid($var)
-    {
-        GPBUtil::checkString($var, True);
-        $this->hash_algorithm_oid = $var;
 
         return $this;
     }
