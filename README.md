@@ -209,3 +209,14 @@ Without a reachable server, the tests are skipped: check that PHPUnit reports no
 set -a; source path/to/server/bootstrap/zitadel/citius-zitadel.env; set +a
 CITIUS_TLS=1 CITIUS_AUTH=1 CITIUS_ROLE=ADMIN vendor/bin/phpunit tests/Integration/ReferenceImplementationTest.php
 ```
+
+To reproduce against the Citius server running on localhost:50051 with TLS enabled, but **auth disabled** (make `run-dev-tls` from `citius-server`): 
+```sh
+# Within the nextcloud dev container
+# (
+# in nextcloud-server directory, start the dev container with 
+# 'docker-compose -f .devcontainer/citius-dev-php/docker-compose.yml up'
+# )
+# Requires a local copy of the root CA certificate used to start the server (default: $(mkcert -CAROOT)/rootCA.pem)
+CITIUS_ADDR=host.containers.internal:50051 CITIUS_TLS=1 CITIUS_TLS_CA=/var/www/citius-php/rootCA.pem CITIUS_TLS_SERVER_NAME=localhost vendor/bin/phpunit --testdox --display-skipped tests/Integration/ReferenceImplementationTest.php
+```
