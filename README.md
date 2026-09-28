@@ -192,12 +192,16 @@ Integration tests without their server are skipped.
 **Go mTLS example:** start the server from `citius-go-sdk/examples/mtls` (`go run server/main.go`, listens on `localhost:50051`), then:
 
 ```bash
-CITIUS_MTLS_EXAMPLE_RESOURCES=/path/to/citius-go-sdk/examples/mtls/resources \
-CITIUS_MTLS_EXAMPLE_ADDR=localhost:50051 \
 vendor/bin/phpunit tests/Integration/GoMtlsExampleTest.php
 ```
 
-From a container, use `host.containers.internal:50051` (Podman) or `host.docker.internal:50051` (Docker) as the address.
+The client certificates and configuration of the example are copied in `tests/Integration/resources/`. From a container, set the address of the host, `host.containers.internal:50051` (Podman) or `host.docker.internal:50051` (Docker):
+
+```bash
+CITIUS_MTLS_EXAMPLE_ADDR=host.containers.internal:50051 vendor/bin/phpunit tests/Integration/GoMtlsExampleTest.php
+```
+
+Without a reachable server, the tests are skipped: check that PHPUnit reports no `Skipped`.
 
 **Reference implementation:** same environment variables as the Go example, whose flags become variables (`-tls` → `CITIUS_TLS=1`, `-auth` → `CITIUS_AUTH=1`, `-role` → `CITIUS_ROLE`, `-auth-token-file` → `CITIUS_AUTH_TOKEN_FILE`):
 

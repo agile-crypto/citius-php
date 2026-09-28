@@ -18,25 +18,18 @@ use PHPUnit\Framework\TestCase;
  * Interoperability with the Go SDK mutual TLS example (citius-go-sdk/examples/mtls), whose server requires
  * a client certificate and the static token "crypto-test-token".
  *
- * Requires the example server to be running and:
- *   CITIUS_MTLS_EXAMPLE_RESOURCES  copy of examples/mtls/resources (certificates and mtls-config.yaml)
- *   CITIUS_MTLS_EXAMPLE_ADDR       server address, default "localhost:50051"
+ * The client certificates and configuration of the example are in resources/. The server address defaults to
+ * the one of the example configuration, "localhost:50051", and can be changed with CITIUS_MTLS_EXAMPLE_ADDR,
+ * e.g. "host.containers.internal:50051" from a container. Tests are skipped when the server is not reachable.
  */
 class GoMtlsExampleTest extends TestCase {
-	private string $resources;
 	private ServiceConfig $config;
 
 	#[\Override]
 	protected function setUp(): void {
-		$resources = (string)getenv('CITIUS_MTLS_EXAMPLE_RESOURCES');
-		if ($resources === '') {
-			$this->markTestSkipped('CITIUS_MTLS_EXAMPLE_RESOURCES is not set');
-		}
-		$this->resources = $resources;
-
 		// The example configuration uses paths relative to the parent of resources/, like the Go client
 		$cwd = (string)getcwd();
-		chdir(dirname($resources));
+		chdir(__DIR__);
 		try {
 			$example = Config::load('resources/mtls-config.yaml')->resolve(Service::Crypto);
 		} finally {
@@ -48,6 +41,13 @@ class GoMtlsExampleTest extends TestCase {
 			$example->auth,
 			$example->timeout,
 		);
+
+		[$host, $port] = [parse_url('//' . $this->config->endpoint, PHP_URL_HOST), parse_url('//' . $this->config->endpoint, PHP_URL_PORT)];
+		$socket = @fsockopen((string)$host, (int)$port, $errno, $error, 1.0);
+		if ($socket === false) {
+			$this->markTestSkipped(sprintf('Go mTLS example server not reachable at %s (%s); set CITIUS_MTLS_EXAMPLE_ADDR', $this->config->endpoint, $error));
+		}
+		fclose($socket);
 	}
 
 	public function testExampleConfiguration(): void {
@@ -85,7 +85,7 @@ class GoMtlsExampleTest extends TestCase {
 	}
 
 	private function absolute(TlsConfig $tls): TlsConfig {
-		$path = fn (string $file): string => $file === '' ? '' : dirname($this->resources) . '/' . $file;
+		$path = static fn (string $file): string => $file === '' ? '' : __DIR__ . '/' . $file;
 		return new TlsConfig($path($tls->caCert), $path($tls->clientCert), $path($tls->clientKey), $tls->insecure, $tls->serverName, $tls->minVersion);
 	}
 }

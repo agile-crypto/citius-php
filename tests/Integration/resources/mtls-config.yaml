@@ -1,0 +1,18 @@
+default:
+  endpoint: "localhost:50051"
+  tls:
+    server_name: "crypto.test.example.com"
+    ca_cert: "resources/ca_cert.pem"
+    client_cert: "resources/client_cert.pem"
+    client_key: "resources/client_key.pem"
+    min_version: "1.2"
+  auth:
+    enabled: true
+    static_token: "crypto-test-token"
+  timeout: "10s"
+
+crypto: {}
+
+key_management: {}
+
+
