@@ -3,7 +3,8 @@
 PHP gRPC client for the Citius crypto API (`caas.crypto.v1`):
 
 - client stubs generated from the protobuf definitions of [citius/api](https://github.ibm.com/citius/api), included as a git submodule in `proto/api`;
-- connections built from the YAML configuration of the [Citius Go SDK](https://github.com/agile-crypto/citius-go-sdk), with TLS, mutual TLS and bearer token authentication.
+- connections built from the YAML configuration of the [Citius Go SDK](https://github.com/agile-crypto/citius-go-sdk), with TLS, mutual TLS and bearer token authentication;
+- crypto policy evaluation (allowed algorithms), either locally from a policy file or by a Citius server ([Crypto policies](#crypto-policies)).
 
 Only the services needed by the Nextcloud WebAuthn adapter are generated:
 
@@ -15,17 +16,21 @@ Only the services needed by the Nextcloud WebAuthn adapter are generated:
 
 Generation works per service (proto file), not per RPC, so each client exposes all RPCs of its service.
 
-## Layout
+## 1. Layout
 
 | Path | Content |
 |---|---|
 | `proto/api/` | Git submodule `citius/api`, tracking `main` (the `.proto` sources) |
 | `buf.gen.php.yaml` | buf generation template for PHP |
 | `gen/Citius/Grpc/` | Generated code (do not edit), autoloaded as `Citius\Grpc\` |
-| `src/` | Configuration, connection and authentication, autoloaded as `Citius\Client\` |
+| `src/` | Hand-written client code, autoloaded as `Citius\Client\` |
+| `src/Config/` | Client configuration (YAML schema of the Go SDK) |
+| `src/Dial/`, `src/Auth/` | Connections: TLS, mutual TLS, timeouts, bearer tokens |
+| `src/Common/` | Types shared by the services, such as `Scope` |
+| `src/Policy/` | Crypto policy evaluation, local or remote |
 | `tests/` | Unit and integration tests |
 
-## Clone
+## 2. Clone
 
 The submodule URL uses SSH, so you need read access to `citius/api` and an SSH key on github.ibm.com.
 
@@ -39,12 +44,12 @@ In an existing clone without the submodule checked out:
 git submodule update --init
 ```
 
-## Requirements
+## 3. Requirements
 
 - Generation: [buf](https://buf.build/docs/installation) (`brew install bufbuild/buf/buf`) and network access to `buf.build`, which hosts the remote plugins. Unauthenticated requests are rate limited (`resource_exhausted: too many requests`). Log in with `buf registry login`, or set `BUF_TOKEN` where no login is stored, for example in a container.
-- Runtime: PHP >= 8.3 with the `grpc` and `openssl` extensions. The `protobuf` extension is optional but recommended.
+- Runtime: PHP >= 8.3 with the `openssl` extension. The `grpc` extension is needed to call a Citius server, including remote policies; local policies work without it, so Composer only suggests it. The `protobuf` extension is optional but recommended.
 
-## Generate the PHP code
+## 4. Generate the PHP code
 
 From the repository root:
 
@@ -65,7 +70,7 @@ composer run generate
 
 To generate another service, add its file with an extra `--path` in both the command above and the `generate` script in `composer.json`. Its message and type dependencies are included automatically.
 
-## Update the API version
+## 5. Update the API version
 
 Move the submodule to the latest commit of `main`, regenerate, and commit the submodule pointer together with `gen/`, so each version of `gen/` matches the API commit it was generated from:
 
@@ -83,7 +88,7 @@ git -C proto/api fetch --tags
 git -C proto/api checkout v0.2.0
 ```
 
-## What the template does
+## 6. What the template does
 
 | Setting | Reason |
 |---|---|
@@ -92,7 +97,7 @@ git -C proto/api checkout v0.2.0
 | `managed.override` | Puts messages and clients in `Citius\Grpc\Crypto\V1` and metadata in `Citius\Grpc\GPBMetadata\...`, instead of generic global names such as `GPBMetadata\Types\Common`. |
 | Pinned plugin versions | `protocolbuffers/php:v33.2` matches the `google/protobuf` 4.33 runtime. Generated code must not be newer than the runtime, so bump the plugin and the `google/protobuf` constraint in `composer.json` together. `grpc/php:v1.83.1` matches the `grpc` extension. |
 
-## Configuration
+## 7. Configuration
 
 The YAML schema is the one of the Citius Go SDK, so the same file configures Go and PHP clients (see [Differences with the Go SDK](#differences-with-the-go-sdk)):
 
@@ -119,7 +124,7 @@ key_management:
 
 Services: `crypto`, `key_management`, `crypto_policy`, `discovery`, `key_establishment`, `provider`, `streaming_crypto`. Relative file paths resolve against the current working directory, as in Go.
 
-## Usage
+## 8. Usage
 
 `Connector::connect()` (Go: `dial.Connect`) builds the `(hostname, opts, channel)` triplet taken by the generated clients:
 
@@ -166,12 +171,103 @@ $valid = $response->getValid();
 | Case | Go | PHP |
 |---|---|---|
 | `min_version: "1.3"` | Enforced | `ConfigException`: the PHP gRPC extension cannot set the TLS version. gRPC enforces TLS >= 1.2 and negotiates 1.3 when the server supports it. |
-| Only one of `client_cert` / `client_key` | Silently no client certificate | `ConfigException` |
-| Token file with a trailing newline | Newline sent in the header | Surrounding whitespace trimmed |
-| Negative `timeout` | Accepted: every call fails immediately | `ConfigException` |
-| Wrong value types, e.g. `insecure: "yes"` | YAML decoding error | `ConfigException` naming the key |
 
-## Tests
+## 9. Crypto policies
+
+A policy tells which algorithms may be used for a scope, such as `signature_standard`. Algorithms are identified by templates in the [CycloneDX Cryptography Registry](https://cyclonedx.org/registry/cryptography/) format, e.g. `ML-DSA-44` or `ECDSA-P-256-SHA-256`. For each scope, a policy returns two lists, in order of preference:
+
+| List | Use |
+|---|---|
+| Allowed templates | Without restriction |
+| Legacy templates | Only by recipients, e.g. to verify a signature or decrypt; never to produce new cryptographic artifacts |
+
+### Local or remote
+
+The `crypto_policy` section of the client configuration selects where policies are evaluated. `mode` is required:
+
+```yaml
+# Local: no connection, policies are read from a file
+crypto_policy:
+  mode: local
+  policies: "/etc/citius/policies.yaml"
+
+# Remote: evaluated by the CryptoPolicyService of a Citius server
+crypto_policy:
+  mode: remote
+  endpoint: "policy.example.com:443"   # connection settings as for any service, inherited from "default"
+```
+
+The Go SDK ignores `mode` and `policies`, so the same file still configures Go clients.
+
+### Policy file (local mode)
+
+```yaml
+policies:
+  - name: nextcloud-webauthn             # unique
+    scopes:
+      signature_standard:                # a Scope value, see below
+        allowed_algorithms:              # in order of preference
+          - ML-DSA-44
+          - ECDSA-P-256-SHA-256
+        legacy_algorithms:               # recipient usage only
+          - RSA-PKCS1-1.5-SHA-256-2048
+      signature_prehashed:
+        allowed_algorithms: [ECDSA-P-256-SHA-256]
+```
+
+- Both lists are optional. A template may not appear twice in a list, nor in both lists of the same scope.
+- A scope missing from a policy returns empty lists.
+- The file is validated when loaded. Errors (unknown scope, duplicate policy name, wrong types) throw `ConfigException` naming the location, e.g. `policies[0].scopes.signature_standard.allowed_algorithms`.
+
+### Usage
+
+```php
+use Citius\Client\Common\Scope;
+use Citius\Client\Policy\PolicyServiceFactory;
+
+$policies = PolicyServiceFactory::fromFile('/etc/citius/client.yaml');   // or fromConfig(Config)
+
+$result = $policies->listAllowedAlgorithms('nextcloud-webauthn', Scope::SignatureStandard);
+$result->allowedTemplates;   // ['ML-DSA-44', 'ECDSA-P-256-SHA-256']
+$result->legacyTemplates;    // ['RSA-PKCS1-1.5-SHA-256-2048']
+```
+
+| Class | Role |
+|---|---|
+| `Citius\Client\Policy\PolicyService` | Interface: `listAllowedAlgorithms(string $policyName, Scope $scope): AllowedAlgorithmsResult` |
+| `Citius\Client\Policy\LocalPolicyService` | Local evaluation. Built from a file (`fromFile()`, `fromYaml()`, `fromArray()`), or from lists: `new LocalPolicyService(['name' => [Scope::SignatureStandard->value => new AllowedAlgorithmsResult([...], [...])]])` |
+| `Citius\Client\Policy\RemotePolicyAdapter` | Remote evaluation through a `CryptoPolicyServiceClient`. Sends the policy name and a scope filter holding only the given scope |
+| `Citius\Client\Policy\PolicyServiceFactory` | Builds either implementation from the `crypto_policy` section. Remote mode reuses `Connector`, so TLS, authentication and timeouts come from the configuration |
+| `Citius\Client\Policy\AllowedAlgorithmsResult` | `allowedTemplates` and `legacyTemplates` |
+
+| Error | Exception |
+|---|---|
+| Unknown policy (remote: status `NOT_FOUND`) | `Citius\Client\Exception\PolicyNotFoundException` |
+| Server unreachable or other error status | `Citius\Client\Exception\PolicyServiceException`, with the gRPC status as code |
+| Invalid configuration or policy file; remote mode without the `grpc` extension | `Citius\Client\Exception\ConfigException` |
+
+A failure is never returned as an empty result.
+
+### Scopes
+
+`Citius\Client\Common\Scope` lists the operational scopes of all primitives. Values are the names used in policy files, the same as the Go SDK's `Scope.String()`. `toScopeSpecification()` converts a scope to the proto `ScopeSpecification`.
+
+| Primitive | Scopes |
+|---|---|
+| Signature | `signature_standard`, `signature_with_context`, `signature_prehashed`, `signature_prehashed_with_context` |
+| AEAD | `aead_standard`, `aead_deterministic`, `aead_streaming` |
+| MAC | `mac_standard`, `mac_streaming` |
+| KEM | `kem_standard`, `kem_hybrid` |
+| Key agreement | `key_agreement_standard`, `key_agreement_hybrid` |
+| KDF | `kdf_extract_expand`, `kdf_password`, `kdf_agreement`, `kdf_counter`, `kdf_tls`, `kdf_gost`, `kdf_vendor` |
+| Hash | `hash_standard`, `hash_xof` |
+| Key wrapping | `key_wrapping_standard`, `key_wrapping_with_padding` |
+| Symmetric cipher | `symmetric_cipher_block`, `symmetric_cipher_stream` |
+| Disk encryption | `disk_encryption_standard` |
+| Generic secret | `generic_secret_standard` |
+| Asymmetric encryption | `asymmetric_encryption_standard`, `asymmetric_encryption_raw` (not in the Go SDK yet) |
+
+## 10. Tests
 
 ```bash
 composer install
@@ -183,7 +279,10 @@ composer test:integration    # integration tests
 |---|---|---|
 | unit | `ConfigTest` | Port of the Go SDK `config_test.go` on the same fixtures (`tests/fixtures/config`) |
 | unit | `DurationTest`, `AuthTest`, `ConnectorTest` | Nothing. `ConnectorTest` generates a throwaway PKI |
-| integration | `LocalServerTest` | Nothing. Starts local PHP gRPC servers (plaintext, TLS) and checks calls over TLS and mTLS with static and file tokens, server name verification, untrusted servers, missing and wrong tokens, and timeouts |
+| unit | `ScopeTest` | Nothing. Checks that the scopes cover every value of the proto scope enums |
+| unit | `LocalPolicyServiceTest`, `RemotePolicyAdapterTest`, `PolicyServiceFactoryTest` | Nothing. The remote adapter is tested with a fake client |
+| integration | `LocalPolicyTest` | Nothing. Local mode from the client configuration; checks the results against the policy file (`tests/fixtures/policy`) for every policy and scope |
+| integration | `LocalServerTest` | Nothing. Starts local PHP gRPC servers (plaintext, TLS) and checks calls over TLS and mTLS with static and file tokens, server name verification, untrusted servers, missing and wrong tokens, timeouts, and remote policies |
 | integration | `GoMtlsExampleTest` | The Go SDK `examples/mtls` server. Checks interoperability with a Go server that requires client certificates: the PHP gRPC server cannot require them |
 | integration | `ReferenceImplementationTest` | A Citius server reference implementation. Equivalent of the Go `examples/reference_implementation/client`: create policy, create key, sign, verify |
 

@@ -10,6 +10,7 @@ declare(strict_types=1);
  *   mtls: additionally requires a client certificate issued by <pki dir>/client_ca_cert.pem
  */
 
+use Citius\Client\Tests\Support\StubCryptoPolicyService;
 use Citius\Client\Tests\Support\StubCryptoService;
 use Grpc\RpcServer;
 use Grpc\ServerCredentials;
@@ -28,4 +29,5 @@ match ($mode) {
 	'mtls' => $server->addSecureHttp2Port($address, ServerCredentials::createSsl($read('client_ca_cert.pem'), $read('server_key.pem'), $read('server_cert.pem'))),
 };
 $server->handle(new StubCryptoService($token));
+$server->handle(new StubCryptoPolicyService());
 $server->run();

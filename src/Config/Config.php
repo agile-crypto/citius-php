@@ -25,10 +25,13 @@ use Symfony\Component\Yaml\Yaml;
 final class Config {
 	/**
 	 * @param array<string, ServiceConfigOverride|null> $overrides service sections, keyed by {@see Service} value
+	 * @param array<string, array<mixed>|null> $sections raw service sections, including keys outside the Go SDK
+	 *                                                   schema such as the crypto_policy "mode", keyed by {@see Service} value
 	 */
 	public function __construct(
 		public readonly ServiceConfig $default = new ServiceConfig(),
 		public readonly array $overrides = [],
+		public readonly array $sections = [],
 	) {
 	}
 
@@ -74,6 +77,7 @@ final class Config {
 		$default = ServiceConfig::fromArray($reader->map('default') ?? [], 'default');
 
 		$overrides = [];
+		$sections = [];
 		foreach (array_keys($data) as $key) {
 			if ($key === 'default') {
 				continue;
@@ -84,8 +88,9 @@ final class Config {
 			}
 			$section = $reader->map((string)$key);
 			$overrides[$service->value] = $section === null ? null : ServiceConfigOverride::fromArray($section, (string)$key);
+			$sections[$service->value] = $section;
 		}
-		return new self($default, $overrides);
+		return new self($default, $overrides, $sections);
 	}
 
 	/**

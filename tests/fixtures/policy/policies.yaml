@@ -1,0 +1,18 @@
+policies:
+  - name: nextcloud-webauthn
+    scopes:
+      signature_standard:
+        allowed_algorithms:
+          - ML-DSA-44
+          - ECDSA-P-256-SHA-256
+        legacy_algorithms:
+          - RSA-PKCS1-1.5-SHA-256-2048
+      signature_prehashed:
+        allowed_algorithms: [ECDSA-P-256-SHA-256]
+
+  - name: classical-only
+    scopes:
+      signature_standard:
+        allowed_algorithms: [ECDSA-P-256-SHA-256, RSA-PKCS1-1.5-SHA-256-2048]
+
+  - name: empty

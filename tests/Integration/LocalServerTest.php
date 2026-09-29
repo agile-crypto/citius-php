@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Citius\Client\Tests\Integration;
 
+use Citius\Client\Common\Scope;
 use Citius\Client\Config\Config;
 use Citius\Client\Config\Service;
 use Citius\Client\Dial\Connector;
+use Citius\Client\Exception\PolicyNotFoundException;
+use Citius\Client\Policy\PolicyServiceFactory;
 use Citius\Client\Tests\Support\TestPki;
 use Citius\Grpc\Crypto\V1\CryptoServiceClient;
 use Citius\Grpc\Crypto\V1\SignRequest;
@@ -186,6 +189,25 @@ class LocalServerTest extends TestCase {
 
 		$this->assertSame(\Grpc\STATUS_OK, $status->code, $status->details);
 		$this->assertSame('sig:slow', $response->getSignature());
+	}
+
+	public function testRemotePolicyService(): void {
+		$config = Config::fromYaml("default:\n  endpoint: \"127.0.0.1:{$this->port('insecure')}\"\n  tls:\n    insecure: true\n  timeout: \"5s\"\ncrypto_policy:\n  mode: remote\n");
+		$service = PolicyServiceFactory::fromConfig($config);
+
+		$standard = $service->listAllowedAlgorithms('nextcloud-webauthn', Scope::SignatureStandard);
+		$this->assertSame(['ML-DSA-44', 'ECDSA-P-256-SHA-256'], $standard->allowedTemplates);
+		$this->assertSame(['RSA-PKCS1-1.5-SHA-256-2048'], $standard->legacyTemplates);
+
+		$other = $service->listAllowedAlgorithms('nextcloud-webauthn', Scope::AeadStandard);
+		$this->assertSame([], $other->allowedTemplates);
+	}
+
+	public function testRemotePolicyNotFound(): void {
+		$config = Config::fromYaml("default:\n  endpoint: \"127.0.0.1:{$this->port('insecure')}\"\n  tls:\n    insecure: true\n  timeout: \"5s\"\ncrypto_policy:\n  mode: remote\n");
+
+		$this->expectException(PolicyNotFoundException::class);
+		PolicyServiceFactory::fromConfig($config)->listAllowedAlgorithms('missing', Scope::SignatureStandard);
 	}
 
 	/**

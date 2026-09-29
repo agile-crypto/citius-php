@@ -15,11 +15,26 @@ use Google\Protobuf\RepeatedField;
 class ListAllowedAlgorithmsResponse extends \Google\Protobuf\Internal\Message
 {
     /**
+     * Generated from protobuf field <code>string policy_name = 1 [json_name = "policyName"];</code>
+     */
+    protected $policy_name = '';
+    /**
+     * Generated from protobuf field <code>int32 policy_version = 2 [json_name = "policyVersion"];</code>
+     */
+    protected $policy_version = 0;
+    /**
      * List of algorithm templates allowed by the policy (after filtering)
      *
-     * Generated from protobuf field <code>repeated .caas.crypto.v1.AllowedAlgorithmResult allowed_algorithms = 1 [json_name = "allowedAlgorithms"];</code>
+     * Generated from protobuf field <code>repeated string allowed_templates = 3 [json_name = "allowedTemplates"];</code>
      */
-    private $allowed_algorithms;
+    private $allowed_templates;
+    /**
+     * Deprecated: legacy template IDs for backward compatibility. Allow for recipient-usage only (eg. decryption, signature verification). 
+     * Do not use for new operations.
+     *
+     * Generated from protobuf field <code>repeated string legacy_templates = 4 [json_name = "legacyTemplates"];</code>
+     */
+    private $legacy_templates;
 
     /**
      * Constructor.
@@ -27,8 +42,13 @@ class ListAllowedAlgorithmsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Citius\Grpc\Crypto\V1\AllowedAlgorithmResult[] $allowed_algorithms
+     *     @type string $policy_name
+     *     @type int $policy_version
+     *     @type string[] $allowed_templates
      *           List of algorithm templates allowed by the policy (after filtering)
+     *     @type string[] $legacy_templates
+     *           Deprecated: legacy template IDs for backward compatibility. Allow for recipient-usage only (eg. decryption, signature verification). 
+     *           Do not use for new operations.
      * }
      */
     public function __construct($data = NULL) {
@@ -37,27 +57,99 @@ class ListAllowedAlgorithmsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * List of algorithm templates allowed by the policy (after filtering)
-     *
-     * Generated from protobuf field <code>repeated .caas.crypto.v1.AllowedAlgorithmResult allowed_algorithms = 1 [json_name = "allowedAlgorithms"];</code>
-     * @return RepeatedField<\Citius\Grpc\Crypto\V1\AllowedAlgorithmResult>
+     * Generated from protobuf field <code>string policy_name = 1 [json_name = "policyName"];</code>
+     * @return string
      */
-    public function getAllowedAlgorithms()
+    public function getPolicyName()
     {
-        return $this->allowed_algorithms;
+        return $this->policy_name;
+    }
+
+    /**
+     * Generated from protobuf field <code>string policy_name = 1 [json_name = "policyName"];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPolicyName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->policy_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int32 policy_version = 2 [json_name = "policyVersion"];</code>
+     * @return int
+     */
+    public function getPolicyVersion()
+    {
+        return $this->policy_version;
+    }
+
+    /**
+     * Generated from protobuf field <code>int32 policy_version = 2 [json_name = "policyVersion"];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setPolicyVersion($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->policy_version = $var;
+
+        return $this;
     }
 
     /**
      * List of algorithm templates allowed by the policy (after filtering)
      *
-     * Generated from protobuf field <code>repeated .caas.crypto.v1.AllowedAlgorithmResult allowed_algorithms = 1 [json_name = "allowedAlgorithms"];</code>
-     * @param \Citius\Grpc\Crypto\V1\AllowedAlgorithmResult[] $var
+     * Generated from protobuf field <code>repeated string allowed_templates = 3 [json_name = "allowedTemplates"];</code>
+     * @return RepeatedField<string>
+     */
+    public function getAllowedTemplates()
+    {
+        return $this->allowed_templates;
+    }
+
+    /**
+     * List of algorithm templates allowed by the policy (after filtering)
+     *
+     * Generated from protobuf field <code>repeated string allowed_templates = 3 [json_name = "allowedTemplates"];</code>
+     * @param string[] $var
      * @return $this
      */
-    public function setAllowedAlgorithms($var)
+    public function setAllowedTemplates($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Citius\Grpc\Crypto\V1\AllowedAlgorithmResult::class);
-        $this->allowed_algorithms = $arr;
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->allowed_templates = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Deprecated: legacy template IDs for backward compatibility. Allow for recipient-usage only (eg. decryption, signature verification). 
+     * Do not use for new operations.
+     *
+     * Generated from protobuf field <code>repeated string legacy_templates = 4 [json_name = "legacyTemplates"];</code>
+     * @return RepeatedField<string>
+     */
+    public function getLegacyTemplates()
+    {
+        return $this->legacy_templates;
+    }
+
+    /**
+     * Deprecated: legacy template IDs for backward compatibility. Allow for recipient-usage only (eg. decryption, signature verification). 
+     * Do not use for new operations.
+     *
+     * Generated from protobuf field <code>repeated string legacy_templates = 4 [json_name = "legacyTemplates"];</code>
+     * @param string[] $var
+     * @return $this
+     */
+    public function setLegacyTemplates($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->legacy_templates = $arr;
 
         return $this;
     }

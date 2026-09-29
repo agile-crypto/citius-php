@@ -4,7 +4,6 @@
 	"type": "library",
 	"require": {
 		"php": "^8.3",
-		"ext-grpc": "*",
 		"ext-openssl": "*",
 		"google/protobuf": "^4.33",
 		"grpc/grpc": "^1.74",
@@ -14,6 +13,7 @@
 		"phpunit/phpunit": "^11.5"
 	},
 	"suggest": {
+		"ext-grpc": "Required to call a Citius server, including remote crypto policies; local policies work without it",
 		"ext-protobuf": "Native protobuf runtime, faster than the pure PHP implementation of google/protobuf"
 	},
 	"autoload": {
