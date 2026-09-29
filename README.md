@@ -1,12 +1,12 @@
-# citius-php
+# PHP gRPC client
 
 PHP gRPC client for the Citius crypto API (`caas.crypto.v1`):
 
-- client stubs generated from the protobuf definitions of [citius/api](https://github.ibm.com/citius/api), included as a git submodule in `proto/api`;
+- client stubs generated from the protobuf definitions of [citius/api](https://github.com/agile-crypto/api), included as a git submodule in `proto/api`;
 - connections built from the YAML configuration of the [Citius Go SDK](https://github.com/agile-crypto/citius-go-sdk), with TLS, mutual TLS and bearer token authentication;
 - crypto policy evaluation (allowed algorithms), either locally from a policy file or by a Citius server ([Crypto policies](#crypto-policies)).
 
-Only the services needed by the Nextcloud WebAuthn adapter are generated:
+Only the following services are generated:
 
 | Service | Client class | Used for |
 |---|---|---|
@@ -35,7 +35,7 @@ Generation works per service (proto file), not per RPC, so each client exposes a
 The submodule URL uses SSH, so you need read access to `citius/api` and an SSH key on github.ibm.com.
 
 ```bash
-git clone --recurse-submodules  git@github.ibm.com:citius/citius-php.git
+git clone --recurse-submodules  git@github.com:agile-crypto/citius-php.git
 ```
 
 In an existing clone without the submodule checked out:
